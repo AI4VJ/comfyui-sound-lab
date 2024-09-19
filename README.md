@@ -1,11 +1,17 @@
-> [原始节点：] comfyui-sound-lab (https://github.com/shadowcz007/comfyui-sound-lab) 
+> 【原始节点：】 comfyui-sound-lab (https://github.com/shadowcz007/comfyui-sound-lab) 
 > 
-> [新增节点：] Audio2DicNode 见下图， 使得有音频的视频生成更简单！
+> 【新增节点：】Audio2DicNode 见下图， 使得有音频的视频生成更简单！
+>
+> 【分类修改：】类别现在归属： ♾️Sound Lab
 
 
 ![](./nodes2.png)
 
 -------
+
+## 依赖问题
+
+针对Win用户，需要下载ffmpy并编译，
 
 ## 模型
 [musicgen-small](https://huggingface.co/facebook/musicgen-small) 放到文件夹 models/musicgen/：
