@@ -196,7 +196,7 @@ class AudioPlayNode:
 
     RETURN_TYPES = ()
     FUNCTION = "run"
-    CATEGORY = "♾️Mixlab/Audio"
+    CATEGORY = "♾️Sound Lab"
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = ()
     OUTPUT_NODE = True
@@ -249,7 +249,7 @@ class AudioToDictNode:
     RETURN_TYPES = ("AUDIO",)  # 定义返回类型为 AUDIO_DICT
     RETURN_NAMES = ("audio🎥",)
     FUNCTION = "convert_to_dict"
-    CATEGORY = "♾️Mixlab/Audio"
+    CATEGORY = "♾️Sound Lab"
 
     def convert_to_dict(self, audio):
         # 情况 A: 输入是 tensor 类型

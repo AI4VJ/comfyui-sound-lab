@@ -1,3 +1,5 @@
+./ffmpy-0.3.2-py3-none-any.whl; platform_system == "Windows"
+ffmpy; platform_system != "Windows"
 torchaudio
 einops>=0.7.0
 einops-exts>=0.0.4

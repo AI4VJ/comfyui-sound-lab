@@ -1,6 +1,6 @@
 > [原始节点：] comfyui-sound-lab (https://github.com/shadowcz007/comfyui-sound-lab) 
 > 
-> [新增节点：] Audio2DicNode 见下图
+> [新增节点：] Audio2DicNode 见下图， 使得有音频的视频生成更简单！
 
 
 ![](./nodes2.png)
