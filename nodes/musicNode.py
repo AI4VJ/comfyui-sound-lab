@@ -182,7 +182,6 @@ class MusicNode:
                 "type": "output",
                 "prompt":prompt
                 },)
-    
 
 
 class AudioPlayNode:
@@ -193,76 +192,94 @@ class AudioPlayNode:
         self.compress_level = 4
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": {
-            "audio": ("AUDIO",),
-              }, 
-                }
-    
+        return {"required": {"audio": ("AUDIO",)}}
+
     RETURN_TYPES = ()
-  
     FUNCTION = "run"
-
     CATEGORY = "♾️Mixlab/Audio"
-
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = ()
-
     OUTPUT_NODE = True
-  
-    def run(self,audio):
 
-        # 判断是否是 Tensor 类型
-        is_tensor = not isinstance(audio, dict)
-        print('#判断是否是 Tensor 类型',is_tensor,audio)
-        if not is_tensor and 'waveform' in audio and 'sample_rate' in audio:
-            # {'waveform': tensor([], size=(1, 1, 0)), 'sample_rate': 44100}
-            is_tensor=True
+    def run(self, audio):
+        # 判断是否是 Tensor 类型或包含必要的音频数据
+        is_tensor = isinstance(audio, dict) and 'waveform' in audio and 'sample_rate' in audio
+        print('# 判断是否是有效的音频数据', is_tensor, audio)
 
+        results = []
         if is_tensor:
-            filename_prefix=""
-            # 保存
-            filename_prefix += self.prefix_append
-            full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
-            results = list()
-            
+            filename_prefix = self.prefix_append
+            # 保存音频文件
+            full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
+                filename_prefix, self.output_dir)
+
             filename_with_batch_num = filename.replace("%batch_num%", str(1))
             file = f"{filename_with_batch_num}_{counter:05}_.wav"
-            
-            torchaudio.save(os.path.join(full_output_folder, file), audio['waveform'].squeeze(0), audio["sample_rate"])
-            results.append({
+
+            try:
+                torchaudio.save(os.path.join(full_output_folder, file), audio['waveform'].squeeze(0),
+                                audio["sample_rate"])
+                results.append({
                     "filename": file,
                     "subfolder": subfolder,
                     "type": self.type
                 })
-            
+            except Exception as e:
+                print(f"Error saving audio file: {e}")
         else:
-            results=[audio]
-                
+            # 如果不是 Tensor 类型或有效的音频字典，直接返回输入
+            results = [audio]
 
-        # print(audio)
-        return {"ui": {"audio":results}}
+        # return {"ui": {"audio": results}}
+        return {"ui": {"audio": results}}
 
-#todo
-# class LoadAudioNode:
 
-#     @classmethod
-#     def INPUT_TYPES(s):
-#         return {"required": {
-#                     "audio": ("AUDIO",),
-#               }, 
-#                 }
-    
-#     RETURN_TYPES = ()
-  
-#     FUNCTION = "run"
+class AudioToDictNode:
+    def __init__(self):
+        pass
 
-#     CATEGORY = "♾️Sound Lab"
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "audio": ("AUDIO",),  # 接受 AUDIO 类型的输入
+            },
+        }
 
-#     INPUT_IS_LIST = False
-#     OUTPUT_IS_LIST = ()
+    RETURN_TYPES = ("AUDIO",)  # 定义返回类型为 AUDIO_DICT
+    RETURN_NAMES = ("audio🎥",)
+    FUNCTION = "convert_to_dict"
+    CATEGORY = "♾️Mixlab/Audio"
 
-#     OUTPUT_NODE = True
-  
-#     def run(self,audio):
-#         # print(audio)
-#         return {"ui": {"audio":[audio]}}
+    def convert_to_dict(self, audio):
+        # 情况 A: 输入是 tensor 类型
+        if isinstance(audio, torch.Tensor):
+            audio_dict = {
+                "waveform": audio,
+                "sample_rate": 32000  # 默认采样率
+            }
+            return (audio_dict,)
+
+        # 情况 B: 输入已经是完整的字典格式
+        if isinstance(audio, dict) and 'waveform' in audio and 'sample_rate' in audio:
+            return (audio,)  # 直接返回原始字典格式
+
+        # 情况 C: 输入是包含文件信息的字典，需要读取音频文件
+        if isinstance(audio, dict) and "filename" in audio:
+            file_path = os.path.join(audio.get("subfolder", ""), audio["filename"])
+            output_dir = folder_paths.get_output_directory()
+            audio_path = os.path.join(output_dir, file_path)
+            try:
+                waveform, sample_rate = torchaudio.load(audio_path)
+                # 确保 waveform 是 3D 张量
+                waveform = waveform.unsqueeze(0) if waveform.dim() == 2 else waveform
+                audio_dict = {
+                    "waveform": waveform,
+                    "sample_rate": sample_rate
+                }
+                return (audio_dict,)
+            except Exception as e:
+                raise ValueError(f"Error loading audio file {file_path}: {e}")
+
+        # 如果输入不符合上述任何一种情况，抛出异常
+        raise ValueError("Unsupported audio input format")
