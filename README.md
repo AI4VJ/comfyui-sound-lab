@@ -1,10 +1,11 @@
+> [原始节点：] comfyui-sound-lab (https://github.com/shadowcz007/comfyui-sound-lab) 
+> 
+> [新增节点：] Audio2DicNode 见下图
 
-> [寻求帮助 Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
-> [推荐：mixlab-nodes](https://github.com/shadowcz007/comfyui-mixlab-nodes)
+![](./nodes2.png)
 
-
-![](./nodes.png)
+-------
 
 ## 模型
 [musicgen-small](https://huggingface.co/facebook/musicgen-small) 放到文件夹 models/musicgen/：
